@@ -12,7 +12,7 @@ w1_angle = 0*(3.1415/180)
 w2_angle = 120*(3.1415/180)
 w3_angle = 240*(3.1415/180)
 
-
+angles = np.array([w1_angle,w2_angle,w3_angle])
 #From ps4
 Vx = float(input("Velocity of chasis in x direction: "))
 Vy = float(input("Velocity of chasis in y direction: "))
