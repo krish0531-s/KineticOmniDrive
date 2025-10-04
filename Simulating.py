@@ -27,5 +27,6 @@ J = np.array((
 v_chasis = np.array([Vx, Vy, W])
 v_wheels = np.dot(J, v_chasis)
 print("Vx, Vy W = ", end = ' ')
+print(v_wheels)
 for i in v_wheels:
     print(v_wheels, end = ' ')
