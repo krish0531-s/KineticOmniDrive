@@ -1,45 +1,31 @@
 import numpy as np
 
-# --------------------------
-# Robot parameters
-# --------------------------
-R = 0.1   # Distance from center to wheel (meters)
-r = 0.05  # Wheel radius (meters)
+R = 0.1
+r = 0.05
 
-# Wheel placement angles in radians
-psi = np.deg2rad([90, -30, 210])
+#Create robot geometry
+w1_angle = 0*(3.1415/180)
+w2_angle = 120*(3.1415/180)
+w3_angle = 240*(3.1415/180)
 
-# --------------------------
-# Jacobian matrix
-# --------------------------
-J = np.array([
-    [-np.sin(psi[0]), np.cos(psi[0]), R],
-    [-np.sin(psi[1]), np.cos(psi[1]), R],
-    [-np.sin(psi[2]), np.cos(psi[2]), R]
-]) / r
 
-print("Jacobian Matrix:")
-print(J)
 
-# --------------------------
-# Desired chassis velocities
-# --------------------------
-Vx = 0.2   # Forward velocity (m/s)
-Vy = 0.2   # Sideways velocity (m/s)
-omega = 0.0  # Rotation (rad/s)
 
-v_chassis = np.array([[Vx], [Vy], [omega]])
+#From ps4
+Vx = float(input("Velocity of chasis in x direction: "))
+Vy = float(input("Velocity of chasis in y direction: "))
+W = float(input("Angular velocity of Bot around centre of chasis: "))
 
-# --------------------------
-# Compute wheel speeds
-# --------------------------
-v_wheels = np.dot(J, v_chassis)
 
-print("\nWheel Linear Velocities (m/s):")
-print(v_wheels)
+#Jacobian
+J = np.array((
+    [-np.sin(w1_angle), np.cos(w1_angle), R],
+    [-np.sin(w2_angle), np.cos(w2_angle), R],
+    [-np.sin(w3_angle), np.cos(w3_angle), R]
+    ))/r
 
-# Convert to wheel angular velocity (rad/s)
-omega_wheels = v_wheels * (1/r)
-
-print("\nWheel Angular Velocities (rad/s):")
-print(omega_wheels)
+v_chasis = np.array([Vx, Vy, W])
+v_wheels = np.dot(J, v_chasis)
+print("Vx, Vy W = ", end = ' ')
+for i in v_wheels:
+    print(v_wheels, end = ' ')

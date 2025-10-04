@@ -1,38 +1,37 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# -------------------------------
 # Robot geometry
-# -------------------------------
 R = 0.1   # Distance from center to wheel (m)
 r = 0.05  # Wheel radius (m)
 
-# Wheel angles (placement)
-angles_deg = [90, 210, 330]
-angles = np.deg2rad(angles_deg)
 
-# -------------------------------
-# Input chassis velocity
-# -------------------------------
-Vx = 0.0     # m/s
-Vy = 1.0     # m/s
-W  = 0.0     # rad/s
 
-# -------------------------------
-# Jacobian (same as before)
-# -------------------------------
+#Create robot geometry
+w1_angle = 0*(3.1415/180)
+w2_angle = 120*(3.1415/180)
+w3_angle = 240*(3.1415/180)
+
+
+#From ps4
+Vx = float(input("Velocity of chasis in x direction: "))
+Vy = float(input("Velocity of chasis in y direction: "))
+W = float(input("Angular velocity of Bot around centre of chasis: "))
+
+
+# Jacobian 
 J = np.array([
-    [-np.sin(angles[0]), np.cos(angles[0]), R],
-    [-np.sin(angles[1]), np.cos(angles[1]), R],
-    [-np.sin(angles[2]), np.cos(angles[2]), R]
+    [-np.sin(w1_angle), np.cos(w1_angle), R],
+    [-np.sin(w2_angle), np.cos(w2_angle), R],
+    [-np.sin(w3_angle), np.cos(w3_angle), R]
 ]) / r
 
 v_chassis = np.array([Vx, Vy, W])
 v_wheels = np.dot(J, v_chassis)
 
-# -------------------------------
+
 # Visualization
-# -------------------------------
+
 fig, ax = plt.subplots(figsize=(6, 6))
 ax.set_aspect('equal')
 ax.set_xlim(-0.15, 0.15)
