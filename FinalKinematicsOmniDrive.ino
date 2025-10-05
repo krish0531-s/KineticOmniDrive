@@ -1,19 +1,18 @@
 #include <PS4BT.h>
 #include <usbhub.h>
 
-// ------------------- USB & PS4 -------------------
+
 USB Usb;
 BTD Btd(&Usb);
 PS4BT PS4(&Btd);
 
-// ------------------- Constants -------------------
-const float PI = 3.1415926535;
-const float R = 0.1;     // distance from center to wheel (m)
-const float r = 0.05;    // wheel radius (m)
+
+//const float PI = 3.1415926535;
+const float R_wheel = 0.1;     // distance from center to wheel (m)
+const float r_wheel = 0.05;    // wheel radius (m)
 const float maxVel = 0.5;     // max linear velocity (m/s)
 const float maxOmega = 2.0;   // max angular velocity (rad/s)
 
-// ------------------- Cytron MDD20A pins -------------------
 int M1_PWM = 3;
 int M1_DIR = 4;
 
@@ -23,19 +22,19 @@ int M2_DIR = 6;
 int M3_PWM = 9;
 int M3_DIR = 10;
 
-// ------------------- Wheel geometry -------------------
+//
 float w1_angle = 0 * (PI / 180);
 float w2_angle = 120 * (PI / 180);
 float w3_angle = 240 * (PI / 180);
 
-// Jacobian matrix
+// Jacobian 
 float J[3][3] = {
-  {-sin(w1_angle), cos(w1_angle), R},
-  {-sin(w2_angle), cos(w2_angle), R},
-  {-sin(w3_angle), cos(w3_angle), R}
+  {-sin(w1_angle), cos(w1_angle), R_wheel},
+  {-sin(w2_angle), cos(w2_angle), R_wheel},
+  {-sin(w3_angle), cos(w3_angle), R_wheel}
 };
 
-// ------------------- Velocity variables -------------------
+
 float Vx = 0.0;
 float Vy = 0.0;
 float W  = 0.0;
@@ -44,14 +43,10 @@ float v_wheels_1 = 0.0;
 float v_wheels_2 = 0.0;
 float v_wheels_3 = 0.0;
 
-// ------------------- Functions -------------------
-
-// Floating point map
-float mapFloat(float value, float in_min, float in_max, float out_min, float out_max) {
+float map1(float value, float in_min, float in_max, float out_min, float out_max) {
     return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-// Drive motor for Cytron
 void driveMotor(int pwmPin, int dirPin, float omega) {
     bool dir = (omega >= 0);
     int pwm = (int)(fabs(omega) / maxOmega * 255.0);
@@ -65,7 +60,6 @@ void driveMotor(int pwmPin, int dirPin, float omega) {
     analogWrite(pwmPin, pwm);
 }
 
-// ------------------- Setup -------------------
 void setup() {
     Serial.begin(115200);
 
@@ -80,7 +74,6 @@ void setup() {
     Serial.println("Waiting for PS4 controller...");
 }
 
-// ------------------- Main Loop -------------------
 void loop() {
     Usb.Task();
 
@@ -96,26 +89,25 @@ void loop() {
         W  = rx - 128; // right stick X
 
         // Map joystick to real velocities
-        Vx = mapFloat(Vx, -128, 127, -maxVel, maxVel);
-        Vy = mapFloat(Vy, -128, 127, -maxVel, maxVel);
-        W  = mapFloat(W, -128, 127, -maxOmega, maxOmega);
+        Vx = map1(Vx, -128, 127, -maxVel, maxVel);
+        Vy = map1(Vy, -128, 127, -maxVel, maxVel);
+        W  = map1(W, -128, 127, -maxOmega, maxOmega);
 
-        // ------------------- Inverse Kinematics -------------------
-        v_wheels_1 = (J[0][0]*Vx + J[0][1]*Vy + J[0][2]*W) / r;
-        v_wheels_2 = (J[1][0]*Vx + J[1][1]*Vy + J[1][2]*W) / r;
-        v_wheels_3 = (J[2][0]*Vx + J[2][1]*Vy + J[2][2]*W) / r;
+        //Inverse Kinematics 
+        v_wheels_1 = (J[0][0]*Vx + J[0][1]*Vy + J[0][2]*W) / r_wheel;
+        v_wheels_2 = (J[1][0]*Vx + J[1][1]*Vy + J[1][2]*W) / r_wheel;
+        v_wheels_3 = (J[2][0]*Vx + J[2][1]*Vy + J[2][2]*W) / r_wheel;
 
-        // ------------------- Drive Motors -------------------
+        //Drive Motor
         driveMotor(M1_PWM, M1_DIR, v_wheels_1);
         driveMotor(M2_PWM, M2_DIR, v_wheels_2);
         driveMotor(M3_PWM, M3_DIR, v_wheels_3);
 
-        // Optional: Serial debugging
-        Serial.print("Vx: "); Serial.print(Vx, 3);
-        Serial.print(" Vy: "); Serial.print(Vy, 3);
-        Serial.print(" W: "); Serial.print(W, 3);
-        Serial.print(" | w1: "); Serial.print(v_wheels_1, 3);
-        Serial.print(" w2: "); Serial.print(v_wheels_2, 3);
-        Serial.print(" w3: "); Serial.println(v_wheels_3, 3);
+        Serial.print("Vx: "); Serial.print(Vx);
+        Serial.print(" Vy: "); Serial.print(Vy);
+        Serial.print(" W: "); Serial.print(W);
+        Serial.print(" | w1: "); Serial.print(v_wheels_1);
+        Serial.print(" w2: "); Serial.print(v_wheels_2);
+        Serial.print(" w3: "); Serial.println(v_wheels_3);
     }
 }
