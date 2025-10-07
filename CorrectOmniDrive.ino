@@ -1,17 +1,16 @@
 #include "USBHost_t36.h"
 
-// --- USB Host objects ---
+// USB Host objects 
 USBHost mysub;
 USBHub hub1(mysub);                
-JoystickController joystick1(mysub); // For wired joystick
+JoystickController joystick1(mysub); 
 BluetoothController bluet(mysub, true, "0000"); 
 
-// --- Robot parameters ---
+// Robot geometry
 const float r = 0.03; // wheel radius (meters)
 const float L = 0.1;  // distance from center to wheel
 float V1, V2, V3;     // wheel velocities
 
-// --- Cytron MDD20A pin definitions ---
 const int pwmPin1 = 3;
 const int dirPin1 = 4;
 
@@ -29,7 +28,7 @@ void setup() {
   mysub.begin();
   Serial.println("USB Host started.");
 
-  // Setup motor pins
+
   pinMode(pwmPin1, OUTPUT); pinMode(dirPin1, OUTPUT);
   pinMode(pwmPin2, OUTPUT); pinMode(dirPin2, OUTPUT);
   pinMode(pwmPin3, OUTPUT); pinMode(dirPin3, OUTPUT);
@@ -43,11 +42,11 @@ void driveMotor(float omegaDir, int pwmPin, int dirPin, float pwmValue){
 
 
 void loop() {
-  mysub.Task();  // keep USB Host stack running
+  mysub.Task();  // keep USB Host running
 
   int lx=0, ly=0, rx=0;
 
-  // --- Read wired joystick axes ---
+  // Read wired joystick axes 
   if (joystick1.available()) {
     lx = joystick1.getAxis(0);  // Left stick X
     ly = joystick1.getAxis(1);  // Left stick Y
